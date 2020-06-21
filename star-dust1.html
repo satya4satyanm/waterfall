@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <title>Phaser Sandbox Frame</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            background-color: white;
+        }
+    </style>
+<script type="text/javascript" src="libs/3.23.0.js"></script></head>
+
+<body>
+
+    <div id="phaser-example"></div>
+
+    <script type="text/javascript">
+
+    var config = {
+    type: Phaser.WEBGL,
+    width: 800,
+    height: 600,
+    backgroundColor: '#000000',
+    parent: 'phaser-example',
+	physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var game = new Phaser.Game(config);
+var graphics, rect;
+function preload ()
+{
+	this.load.image('spark', 'images/b1.png');
+    this.load.image('spark0', 'images/b1.png');
+    this.load.image('spark1', 'images/b1.png');
+}
+
+function create ()
+{
+sprite1 = this.physics.add.sprite(740, 532, 'spark');
+sprite1.setScale(120,5);
+rect = new Phaser.Geom.Rectangle(-100, 500, 1200, 50);
+graphics = this.add.graphics();
+
+    graphics.lineStyle(1, 0x00ff00, 1);
+
+    graphics.strokeRectShape(rect);
+
+
+    var emitZone = {
+        source: new Phaser.Geom.Line(0, 0, 140, 0),
+        type: 'edge',
+        quantity: 50
+    };
+	var that = this;
+	var started = false;
+	var count = 0;
+	var coll = {
+        contains: function (x, y)
+        {
+            var hit = sprite1.body.hitTest(x, y);
+
+        if (hit) { 
+			if(count <= 500) count++;
+			if(!started && count > 500) { 
+			//that.cameras.main.shake(300);
+				var emitter = that.add.particles('spark').createEmitter({
+        x: 650,
+        y: 500,
+        blendMode: 'SCREEN',
+        scale: { start: 0.7, end: 0.4 },
+        speed: { min: -200, max: 0 },
+        quantity: 60,
+		gravityY: 500,
+			deathZone: { type: 'onEnter', source: rect }
+    });
+	emitter.setEmitZone(emitZone);
+				started = true
+			}		
+		};
+
+        return hit;
+        }
+    };
+	
+	
+	
+	
+	var particles = this.add.particles('spark');
+
+	var emitterblur = particles.createEmitter({
+			x: 820,
+			y: 100,
+			speed: 60,
+			tint: [ 0x1E90FF ],
+			alpha: {start:0.5,end:0.3},
+			scale: {start:1,end:2},
+			angle: { min: 105, max: 160 },
+			lifespan: 3000,
+			frequency: 50,
+			blendMode: 'ADD',
+			gravityY: 90,
+			quantity: 3,
+			deathZone: { type: 'onEnter', source: coll }
+		});
+    var emitter1 = particles.createEmitter({
+        x: 820,
+        y: 100,
+        angle: { min: 105, max: 160 },
+        speed: { min: 75, max: 125 },
+        gravityY: 300,
+        lifespan: { min: 1500, max: 3000 },
+        scale: {start:1, end:0.5},
+        blendMode: 'ADD',
+        quantity: 40,
+		deathZone: { type: 'onEnter', source: coll }
+    });
+
+}
+
+function update ()
+{
+}
+
+
+
+    </script>
+
+
+
+</body></html>
